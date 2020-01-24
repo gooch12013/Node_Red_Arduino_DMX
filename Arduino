@@ -1,0 +1,55 @@
+#include "DmxMaster.h"
+#include <ArduinoJson.h>
+
+void setup() {
+
+  
+  Serial.begin(9600);
+  DmxMaster.usePin(3);
+  DmxMaster.maxChannel(512);
+  
+  while (!Serial)
+{
+    // do nothing
+} ;
+  Serial.println("Serial is setup");
+  Serial.println("Send DMX channel/Value as a JSON payload in the following format:");
+  Serial.println("{\"channels\":");
+  Serial.println("  {\"channel\":1,\"value\":255},");
+  Serial.println("  {\"channel\":2,\"value\":255},");
+  Serial.println("}}");
+  
+
+}
+
+void loop() {
+  
+    //DmxMaster.write(1, 0);
+    
+    if(Serial.available()){
+      DynamicJasonDocument doc(512);
+      DeserializationError error = deserializeJason(doc, Serial);
+      if(error){
+      Serial.print(F("deserializeJason() faild:  "
+      Serial.println(error.c_str{});
+      return;
+      }
+    JasonArray array = doc["channels"].as<JasonArray>();
+      for(JasonVariant v: array){
+        Serial.println(v["channel"].as<int>());
+        Serial.println(v["value"].as<int>());
+        DmxMaster.write(v["channel"].as<int>(), v["value"].as<int>());
+      
+      
+      
+      }
+      
+      
+      }
+    
+    
+    
+    
+  }
+  
+  
